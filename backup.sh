@@ -19,13 +19,13 @@ for DIR in ${BACKUPDIRS}; do
    if [ -d ${MOUNT}/${DIR}/${BACKUPCUR} ]; then
 	#Move the old current backup directory to a dated dir
         echo "Moving ${MOUNT}/${DIR}/${BACKUPCUR} to ${MOUNT}/${DIR}/${BACKUPOLD}" >> ${LOG}
-	#mv ${MOUNT}/${DIR}/${BACKUPCUR} ${MOUNT}/${DIR}/${BACKUPOLD}
+	mv ${MOUNT}/${DIR}/${BACKUPCUR} ${MOUNT}/${DIR}/${BACKUPOLD}
 	#Create our new current dir
 	echo "Creating new  ${MOUNT}/${DIR}/${BACKUPCUR}" >> ${LOG}
-	#mkdir ${MOUNT}/${DIR}/${BACKUPCUR}
+	mkdir ${MOUNT}/${DIR}/${BACKUPCUR}
 	#Backup using rsync and hard links for incremental backups
 	echo "Creating incremental backup of ${DIR} to ${MOUNT}/${DIR}/${BACKUPCUR}" >> ${LOG}
-	rsync -avn --delete --link-dest=${MOUNT}/${DIR}/${BACKUPOLD} ${DIR} ${MOUNT}/${DIR}/${BACKUPCUR} >> ${LOG} 2>&1
+	rsync -av --delete --link-dest=${MOUNT}/${DIR}/${BACKUPOLD} ${DIR} ${MOUNT}/${DIR}/${BACKUPCUR} >> ${LOG} 2>&1
 	echo "Backup of ${DIR} to ${MOUNT}/${DIR}/${BACKUPCUR} completed" >> ${LOG}
 	
    else
