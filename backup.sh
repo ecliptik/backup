@@ -1,5 +1,5 @@
 #!/bin/bash
-DATE=`date +%y%m%d`
+DATE=`date +%Y%m%d`
 LOG=/var/log/backup/backup.${DATE}.log
 MOUNT=/mnt/backup
 UUID="8cedcdbd-4ba1-43c1-9fa4-bceb3298a10e"
@@ -9,7 +9,7 @@ BACKUPOLD=backup.${DATE}
 BACKUPDIRS="/home/ /etc/ /var/lib/libvirt/"
 
 echo "Doing a fsck -ay on ${DISK}" >> ${LOG}
-fsck -ay ${DISK} >> ${LOG} 2>&1
+fsck -a ${DISK} >> ${LOG} 2>&1
 
 #Begin the backup if the mount was successfull
 if mount ${DISK} ${MOUNT} >> ${LOG} 2>&1; then
@@ -18,12 +18,15 @@ echo "Mounted device ${UUID} on ${MOUNT}" >> ${LOG}
 for DIR in ${BACKUPDIRS}; do
    if [ -d ${MOUNT}/${DIR}/${BACKUPCUR} ]; then
 	#Move the old current backup directory to a dated dir
-	mv ${MOUNT}/${DIR}/${BACKUPCUR} ${MOUNT}/${DIR}/${BACKUPOLD}
+        echo "Moving ${MOUNT}/${DIR}/${BACKUPCUR} to ${MOUNT}/${DIR}/${BACKUPOLD}" >> ${LOG}
+	#mv ${MOUNT}/${DIR}/${BACKUPCUR} ${MOUNT}/${DIR}/${BACKUPOLD}
 	#Create our new current dir
-	mkdir ${MOUNT}/${DIR}/${BACKUPCUR}
+	echo "Creating new  ${MOUNT}/${DIR}/${BACKUPCUR}" >> ${LOG}
+	#mkdir ${MOUNT}/${DIR}/${BACKUPCUR}
 	#Backup using rsync and hard links for incremental backups
-	rsync -av --delete --link-dest=${MOUNT}/${DIR}/${BACKUPOLD} ${DIR} ${MOUNT}/${DIR}/${BACKUPCUR} >> ${LOG} 2>&1
-	echo "Backup of ${UUID} to ${MOUNT}/${DIR}/${BACKUPCUR} completed" >> ${LOG}
+	echo "Creating incremental backup of ${DIR} to ${MOUNT}/${DIR}/${BACKUPCUR}" >> ${LOG}
+	rsync -avn --delete --link-dest=${MOUNT}/${DIR}/${BACKUPOLD} ${DIR} ${MOUNT}/${DIR}/${BACKUPCUR} >> ${LOG} 2>&1
+	echo "Backup of ${DIR} to ${MOUNT}/${DIR}/${BACKUPCUR} completed" >> ${LOG}
 	
    else
 	#If there is no current dir assume it wasn't mounted
