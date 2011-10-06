@@ -6,7 +6,7 @@ UUID="8cedcdbd-4ba1-43c1-9fa4-bceb3298a10e"
 DISK="/dev/disk/by-uuid/${UUID}"
 BACKUPCUR=backup.current
 BACKUPOLD=backup.${DATE}
-BACKUPDIRS="/home/ /etc/"
+BACKUPDIRS="/home/ /etc/ /var/lib/libvirt/"
 
 echo "Doing a fsck -ay on ${DISK}" >> ${LOG}
 fsck -ay ${DISK} >> ${LOG} 2>&1
@@ -16,7 +16,7 @@ if mount ${DISK} ${MOUNT} >> ${LOG} 2>&1; then
 echo "Mounted device ${UUID} on ${MOUNT}" >> ${LOG}
 
 for DIR in ${BACKUPDIRS}; do
-   if [ -d ${DIR}/${BACKUPCUR} ]; then
+   if [ -d ${MOUNT}/${DIR}/${BACKUPCUR} ]; then
 	#Move the old current backup directory to a dated dir
 	mv ${MOUNT}/${DIR}/${BACKUPCUR} ${MOUNT}/${DIR}/${BACKUPOLD}
 	#Create our new current dir
