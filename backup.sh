@@ -8,6 +8,7 @@ BACKUPCUR=backup.current
 BACKUPOLD=backup.${DATE}
 BACKUPDIRS="/home/ /etc/ /var/lib/libvirt/"
 PLAYONVM=playon7
+RESTORE=/etc/scripts/restore
 
 echo "Doing a fsck -y on ${DISK}" >> ${LOG}
 fsck -a ${DISK} >> ${LOG} 2>&1
@@ -41,5 +42,10 @@ done
 
 echo "Starting up VM ${PLAYONVM}" >> ${LOG}
 virsh start ${PLAYONVM} >> ${LOG} 2>&1
+
+if [ ! -f ${RESTORE} ]; then
+	echo "No ${RESTORE} file found, umounting ${DISK}" >> ${LOG}
+	umount ${DISK} >> ${LOG} 2>&1
+fi
 
 fi
