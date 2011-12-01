@@ -10,12 +10,19 @@ BACKUPDIRS="/home/ /etc/ /var/lib/libvirt/"
 PLAYONVM=playon7
 RESTORE=/etc/scripts/restore
 
+
 echo "Doing a fsck -y on ${DISK}" >> ${LOG}
 fsck -a ${DISK} >> ${LOG} 2>&1
 
 #Begin the backup if the mount was successfull
 if mount ${DISK} ${MOUNT} >> ${LOG} 2>&1; then
 echo "Mounted device ${UUID} on ${MOUNT}" >> ${LOG}
+
+#Mount the disk but exit before backing up if this is a restore
+if [ -f ${RESTORE} ]; then
+	echo "Restore file ${RESTORE} file found, leaving device ${UUID} mounted on ${MOUNT} and not backing up." >>${LOG}
+	exit 0
+fi
 
 DOMAINID=$(virsh list | grep ${PLAYONVM} | awk {'print $1'})
 echo "Shutting down VM ${PLAYONVM} with domain ID ${DOMAINID}" >> ${LOG}
