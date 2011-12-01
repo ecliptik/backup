@@ -16,9 +16,12 @@ fsck -a ${DISK} >> ${LOG} 2>&1
 #Begin the backup if the mount was successfull
 if mount ${DISK} ${MOUNT} >> ${LOG} 2>&1; then
 echo "Mounted device ${UUID} on ${MOUNT}" >> ${LOG}
+
 DOMAINID=$(virsh list | grep ${PLAYONVM} | awk {'print $1'})
 echo "Shutting down VM ${PLAYONVM} with domain ID ${DOMAINID}" >> ${LOG}
 virsh shutdown ${DOMAINID} >> ${LOG} 2>&1
+#Wait 30 seconds for domain to shutdown
+sleep 30
 
 for DIR in ${BACKUPDIRS}; do
    if [ -d ${MOUNT}/${DIR}/${BACKUPCUR} ]; then
@@ -32,7 +35,7 @@ for DIR in ${BACKUPDIRS}; do
 	echo "Creating incremental backup of ${DIR} to ${MOUNT}/${DIR}/${BACKUPCUR}" >> ${LOG}
 	rsync -av --delete --link-dest=${MOUNT}/${DIR}/${BACKUPOLD} ${DIR} ${MOUNT}/${DIR}/${BACKUPCUR} >> ${LOG} 2>&1
 	echo "Backup of ${DIR} to ${MOUNT}/${DIR}/${BACKUPCUR} completed" >> ${LOG}
-	
+
    else
 	#If there is no current dir assume it wasn't mounted
 	echo "The directory ${MOUNT}/${DIR}/${BACKUPCUR} doesn't exist, failing" >> ${LOG}
