@@ -1,0 +1,1 @@
+Simple backup script that uses rsync and hard linkes for versioning of files. Works with udev to automatically start on detection of the backup device by UUID.
