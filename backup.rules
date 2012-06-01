@@ -1,0 +1,1 @@
+SUBSYSTEMS=="block", ENV{ID_FS_UUID}=="UUID GOES HERE", RUN+="/etc/scripts/backup.sh"
